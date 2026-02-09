@@ -1,0 +1,704 @@
+{
+  "version": "2.0.0",
+  "description": "kintoneカスタマイズパターンカタログ（公式ドキュメント準拠版）",
+  "patterns": [
+    {
+      "id": "field_show_hide",
+      "name": "フィールド表示/非表示制御",
+      "category": "field_control",
+      "description": "特定の条件でフィールドを表示/非表示にする",
+      "keywords": ["表示", "非表示", "隠す", "見せる", "条件", "表示制御"],
+      "parameters": [
+        {
+          "name": "TRIGGER_FIELD",
+          "description": "トリガーとなるフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "CONDITION_VALUE",
+          "description": "条件となる値",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "TARGET_FIELDS",
+          "description": "対象フィールドコードの配列",
+          "type": "array",
+          "required": true
+        },
+        {
+          "name": "SHOW_WHEN_MATCH",
+          "description": "条件一致時に表示するか",
+          "type": "boolean",
+          "required": false,
+          "default": true
+        }
+      ],
+      "file": "patterns/field_show_hide.js",
+      "events": [
+        "app.record.create.show",
+        "app.record.edit.show",
+        "app.record.create.change.{TRIGGER_FIELD}",
+        "app.record.edit.change.{TRIGGER_FIELD}"
+      ]
+    },
+    {
+      "id": "field_disable",
+      "name": "フィールド編集不可制御",
+      "category": "field_control",
+      "description": "特定の条件でフィールドを編集不可にする",
+      "keywords": ["編集不可", "読み取り専用", "ロック", "無効化", "disabled"],
+      "parameters": [
+        {
+          "name": "TRIGGER_FIELD",
+          "description": "トリガーとなるフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "CONDITION_VALUE",
+          "description": "条件となる値",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "TARGET_FIELDS",
+          "description": "対象フィールドコードの配列",
+          "type": "array",
+          "required": true
+        }
+      ],
+      "file": "patterns/field_disable.js",
+      "events": [
+        "app.record.create.show",
+        "app.record.edit.show",
+        "app.record.create.change.{TRIGGER_FIELD}",
+        "app.record.edit.change.{TRIGGER_FIELD}"
+      ]
+    },
+    {
+      "id": "condition_status",
+      "name": "ステータス分岐制御",
+      "category": "condition",
+      "description": "ステータスフィールドの値に応じて処理を分岐",
+      "keywords": ["ステータス", "状態", "分岐", "条件分岐", "状況"],
+      "parameters": [
+        {
+          "name": "STATUS_FIELD",
+          "description": "ステータスフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "CONDITIONS",
+          "description": "条件と処理の配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "status": "ステータス値",
+            "action": "処理内容（show_hide/disable/set_value）",
+            "target_fields": "対象フィールドの配列",
+            "value": "セットする値（set_valueの場合）"
+          }
+        }
+      ],
+      "file": "patterns/condition_status.js",
+      "events": [
+        "app.record.create.show",
+        "app.record.edit.show",
+        "app.record.create.change.{STATUS_FIELD}",
+        "app.record.edit.change.{STATUS_FIELD}"
+      ]
+    },
+    {
+      "id": "style_section_header",
+      "name": "セクション見出し",
+      "category": "style",
+      "description": "スペーサーにセクション見出しを追加してフォームをグルーピング",
+      "keywords": ["見出し", "セクション", "グループ", "区切り", "ヘッダー", "タイトル"],
+      "parameters": [
+        {
+          "name": "SECTIONS",
+          "description": "セクション定義の配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "space_id": "スペーサーの要素ID",
+            "label": "セクション見出しテキスト",
+            "icon": "アイコン（オプション）"
+          }
+        }
+      ],
+      "file": "patterns/style_section_header.js",
+      "css_file": "styles/section_header.css",
+      "events": [
+        "app.record.create.show",
+        "app.record.edit.show",
+        "app.record.detail.show"
+      ]
+    },
+    {
+      "id": "validate_required",
+      "name": "条件付き必須チェック",
+      "category": "validation",
+      "description": "特定の条件で必須チェックを行う",
+      "keywords": ["必須", "入力チェック", "バリデーション", "検証", "エラー"],
+      "parameters": [
+        {
+          "name": "CONDITION_FIELD",
+          "description": "条件となるフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "CONDITION_VALUE",
+          "description": "条件となる値",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "REQUIRED_FIELDS",
+          "description": "必須チェック対象フィールドの配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "field": "フィールドコード",
+            "label": "フィールド名（エラーメッセージ用）"
+          }
+        },
+        {
+          "name": "ERROR_MESSAGE_TEMPLATE",
+          "description": "エラーメッセージテンプレート",
+          "type": "string",
+          "required": false,
+          "default": "{label}は必須項目です"
+        }
+      ],
+      "file": "patterns/validate_required.js",
+      "events": [
+        "app.record.create.submit",
+        "app.record.edit.submit"
+      ]
+    },
+    {
+      "id": "auto_numbering",
+      "name": "自動採番",
+      "category": "auto",
+      "description": "レコード保存時に独自フォーマットで自動採番する",
+      "keywords": ["採番", "連番", "番号", "自動", "ナンバリング", "シーケンス"],
+      "parameters": [
+        {
+          "name": "TARGET_FIELD",
+          "description": "採番結果を格納するフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "PREFIX",
+          "description": "接頭辞（例: INV-, ORD-）",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "DIGITS",
+          "description": "連番の桁数",
+          "type": "number",
+          "required": true,
+          "default": 4
+        },
+        {
+          "name": "DATE_FORMAT",
+          "description": "日付フォーマット（YYYYMM, YYYY等）",
+          "type": "string",
+          "required": false,
+          "default": ""
+        }
+      ],
+      "file": "patterns/auto_numbering.js",
+      "events": [
+        "app.record.create.submit"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/validation-and-assistance/"
+    },
+    {
+      "id": "field_char_count",
+      "name": "文字数カウント表示",
+      "category": "field_control",
+      "description": "入力文字数をリアルタイムで表示する",
+      "keywords": ["文字数", "カウント", "長さ", "制限", "入力補助"],
+      "parameters": [
+        {
+          "name": "TARGET_FIELD",
+          "description": "文字数をカウントするフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "DISPLAY_SPACE",
+          "description": "カウント表示用スペースの要素ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "MAX_LENGTH",
+          "description": "最大文字数（警告表示用、0で無制限）",
+          "type": "number",
+          "required": false,
+          "default": 0
+        }
+      ],
+      "file": "patterns/field_char_count.js",
+      "events": [
+        "app.record.create.show",
+        "app.record.edit.show",
+        "app.record.create.change.{TARGET_FIELD}",
+        "app.record.edit.change.{TARGET_FIELD}"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/validation-and-assistance/"
+    },
+    {
+      "id": "validate_format",
+      "name": "入力フォーマットチェック",
+      "category": "validation",
+      "description": "郵便番号/電話番号/メールアドレスの形式をチェック",
+      "keywords": ["郵便番号", "電話番号", "メール", "形式", "フォーマット", "正規表現"],
+      "parameters": [
+        {
+          "name": "VALIDATIONS",
+          "description": "バリデーション設定の配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "field": "フィールドコード",
+            "label": "フィールド名",
+            "type": "postal | tel | email | custom",
+            "customPattern": "正規表現パターン（customの場合）"
+          }
+        }
+      ],
+      "file": "patterns/validate_format.js",
+      "events": [
+        "app.record.create.submit",
+        "app.record.edit.submit"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/validation-and-assistance/"
+    },
+    {
+      "id": "dropdown_cascade",
+      "name": "ドロップダウン連動",
+      "category": "field_control",
+      "description": "ドロップダウンの値によって別フィールドの値を変更/無効化する",
+      "keywords": ["ドロップダウン", "連動", "カスケード", "選択", "自動入力"],
+      "parameters": [
+        {
+          "name": "TRIGGER_FIELD",
+          "description": "トリガーとなるドロップダウンフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "CASCADE_CONFIG",
+          "description": "連動設定の配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "triggerValue": "トリガー値",
+            "actions": [
+              {
+                "field": "対象フィールド",
+                "action": "setValue | disable | enable | clear",
+                "value": "セットする値（setValueの場合）"
+              }
+            ]
+          }
+        }
+      ],
+      "file": "patterns/dropdown_cascade.js",
+      "events": [
+        "app.record.create.show",
+        "app.record.edit.show",
+        "app.record.create.change.{TRIGGER_FIELD}",
+        "app.record.edit.change.{TRIGGER_FIELD}"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/validation-and-assistance/"
+    },
+    {
+      "id": "group_toggle",
+      "name": "グループフィールド開閉制御",
+      "category": "field_control",
+      "description": "条件に応じてグループフィールドの開閉を自動制御する",
+      "keywords": ["グループ", "開閉", "折りたたみ", "展開", "トグル"],
+      "parameters": [
+        {
+          "name": "TRIGGER_FIELD",
+          "description": "トリガーとなるフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "GROUP_CONFIG",
+          "description": "グループ開閉設定の配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "groupField": "グループフィールドコード",
+            "openWhen": "開く条件値",
+            "operator": "equals | notEquals | contains | notEmpty"
+          }
+        }
+      ],
+      "file": "patterns/group_toggle.js",
+      "events": [
+        "app.record.create.show",
+        "app.record.edit.show",
+        "app.record.detail.show",
+        "app.record.create.change.{TRIGGER_FIELD}",
+        "app.record.edit.change.{TRIGGER_FIELD}"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/validation-and-assistance/"
+    },
+    {
+      "id": "lookup_auto_update",
+      "name": "ルックアップ自動更新",
+      "category": "auto",
+      "description": "ルックアップ元データ更新時に自動で最新情報を取得して更新",
+      "keywords": ["ルックアップ", "自動更新", "参照", "同期", "最新"],
+      "parameters": [
+        {
+          "name": "LOOKUP_FIELD",
+          "description": "ルックアップフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "SOURCE_APP_ID",
+          "description": "ルックアップ元アプリID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "KEY_FIELD",
+          "description": "キーとなるフィールドコード（参照元）",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "COPY_FIELDS",
+          "description": "コピーするフィールドのマッピング",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "source": "参照元フィールドコード",
+            "target": "コピー先フィールドコード"
+          }
+        }
+      ],
+      "file": "patterns/lookup_auto_update.js",
+      "events": [
+        "app.record.edit.show",
+        "app.record.create.change.{LOOKUP_FIELD}",
+        "app.record.edit.change.{LOOKUP_FIELD}"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/validation-and-assistance/"
+    },
+    {
+      "id": "list_button",
+      "name": "一覧画面ボタン追加",
+      "category": "list",
+      "description": "レコード一覧画面にカスタムボタンを追加する",
+      "keywords": ["一覧", "ボタン", "ヘッダー", "カスタムボタン", "アクション"],
+      "parameters": [
+        {
+          "name": "BUTTONS",
+          "description": "ボタン設定の配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "id": "ボタンID",
+            "label": "ボタンラベル",
+            "action": "reload | custom | openUrl",
+            "url": "URL（openUrlの場合）",
+            "functionName": "関数名（customの場合）"
+          }
+        }
+      ],
+      "file": "patterns/list_button.js",
+      "events": [
+        "app.record.index.show"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/record-list-customize/add-buttons-to-record-list/"
+    },
+    {
+      "id": "list_conditional_style",
+      "name": "一覧画面条件書式",
+      "category": "list",
+      "description": "条件に応じてレコード一覧の行に背景色を設定する",
+      "keywords": ["一覧", "条件書式", "背景色", "ハイライト", "色分け"],
+      "parameters": [
+        {
+          "name": "CONDITIONS",
+          "description": "条件設定の配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "field": "フィールドコード",
+            "operator": "equals | notEquals | contains | greaterThan | lessThan | empty | notEmpty",
+            "value": "条件値",
+            "backgroundColor": "背景色（例: #d4edda）",
+            "textColor": "文字色（例: #155724）"
+          }
+        }
+      ],
+      "file": "patterns/list_conditional_style.js",
+      "events": [
+        "app.record.index.show"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/record-list-customize/"
+    },
+    {
+      "id": "list_progress_bar",
+      "name": "プログレスバー表示",
+      "category": "list",
+      "description": "ステータスをプログレスバーとして視覚化する",
+      "keywords": ["プログレス", "進捗", "ステータス", "バー", "視覚化"],
+      "parameters": [
+        {
+          "name": "STATUS_FIELD",
+          "description": "ステータスフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "DISPLAY_SPACE",
+          "description": "プログレスバー表示用スペースの要素ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "STEPS",
+          "description": "ステップ設定の配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "value": "ステータス値",
+            "label": "表示ラベル",
+            "color": "色（例: #28a745）"
+          }
+        }
+      ],
+      "file": "patterns/list_progress_bar.js",
+      "events": [
+        "app.record.detail.show",
+        "app.record.create.show",
+        "app.record.edit.show"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/record-list-customize/"
+    },
+    {
+      "id": "table_total",
+      "name": "テーブル合計計算",
+      "category": "table",
+      "description": "テーブル内の数値フィールドを合計して表示する",
+      "keywords": ["テーブル", "合計", "集計", "計算", "サブテーブル"],
+      "parameters": [
+        {
+          "name": "TABLE_FIELD",
+          "description": "テーブルフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "CALCULATIONS",
+          "description": "計算設定の配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "sourceField": "テーブル内の集計元フィールドコード",
+            "targetField": "集計結果を格納するフィールドコード",
+            "operation": "sum | average | count | max | min"
+          }
+        }
+      ],
+      "file": "patterns/table_total.js",
+      "events": [
+        "app.record.create.show",
+        "app.record.edit.show",
+        "app.record.create.change.{TABLE_FIELD}",
+        "app.record.edit.change.{TABLE_FIELD}"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/table/"
+    },
+    {
+      "id": "table_add_row",
+      "name": "テーブル行追加ボタン",
+      "category": "table",
+      "description": "ボタンクリックでテーブルに行を追加する",
+      "keywords": ["テーブル", "行追加", "ボタン", "サブテーブル"],
+      "parameters": [
+        {
+          "name": "TABLE_FIELD",
+          "description": "テーブルフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "BUTTON_SPACE",
+          "description": "ボタン表示用スペースの要素ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "BUTTON_LABEL",
+          "description": "ボタンのラベル",
+          "type": "string",
+          "required": true,
+          "default": "行を追加"
+        },
+        {
+          "name": "DEFAULT_VALUES",
+          "description": "追加行のデフォルト値",
+          "type": "object",
+          "required": false,
+          "default": {}
+        }
+      ],
+      "file": "patterns/table_add_row.js",
+      "events": [
+        "app.record.create.show",
+        "app.record.edit.show"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/table/"
+    },
+    {
+      "id": "auto_status_update",
+      "name": "自動ステータス更新",
+      "category": "process",
+      "description": "レコード保存時に条件に応じてステータスを自動更新する",
+      "keywords": ["ステータス", "自動更新", "プロセス", "ワークフロー"],
+      "parameters": [
+        {
+          "name": "STATUS_FIELD",
+          "description": "ステータスフィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "RULES",
+          "description": "ステータス更新ルールの配列",
+          "type": "array",
+          "required": true,
+          "schema": {
+            "conditions": [
+              {
+                "field": "条件フィールドコード",
+                "operator": "equals | notEquals | contains | empty | notEmpty",
+                "value": "条件値"
+              }
+            ],
+            "newStatus": "新しいステータス値",
+            "fromStatus": ["適用元ステータスの配列（空で全対象）"]
+          }
+        }
+      ],
+      "file": "patterns/auto_status_update.js",
+      "events": [
+        "app.record.create.submit",
+        "app.record.edit.submit"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/process-management/"
+    },
+    {
+      "id": "elapsed_years",
+      "name": "経過年数/日数表示",
+      "category": "date",
+      "description": "基準日からの経過年数・月数・日数をリアルタイム表示する",
+      "keywords": ["経過", "年数", "日数", "勤続", "期間", "日付計算"],
+      "parameters": [
+        {
+          "name": "DATE_FIELD",
+          "description": "基準日フィールドコード",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "DISPLAY_SPACE",
+          "description": "表示用スペースの要素ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "FORMAT",
+          "description": "表示フォーマット",
+          "type": "string",
+          "required": false,
+          "default": "full",
+          "enum": ["years", "months", "days", "full"]
+        },
+        {
+          "name": "LABEL",
+          "description": "表示ラベル",
+          "type": "string",
+          "required": false,
+          "default": ""
+        }
+      ],
+      "file": "patterns/elapsed_years.js",
+      "events": [
+        "app.record.detail.show",
+        "app.record.create.show",
+        "app.record.edit.show",
+        "app.record.create.change.{DATE_FIELD}",
+        "app.record.edit.change.{DATE_FIELD}"
+      ],
+      "reference": "https://cybozu.dev/ja/kintone/tips/development/customize/date-format/"
+    }
+  ],
+  "categories": [
+    {
+      "id": "field_control",
+      "name": "フィールド制御",
+      "description": "フィールドの表示/非表示、編集可否の制御"
+    },
+    {
+      "id": "condition",
+      "name": "条件分岐",
+      "description": "条件に応じた処理の分岐"
+    },
+    {
+      "id": "validation",
+      "name": "バリデーション",
+      "description": "入力値の検証"
+    },
+    {
+      "id": "style",
+      "name": "見た目装飾",
+      "description": "UIの見た目をカスタマイズ"
+    },
+    {
+      "id": "auto",
+      "name": "自動処理",
+      "description": "自動採番、自動更新などの自動化処理"
+    },
+    {
+      "id": "list",
+      "name": "一覧画面",
+      "description": "レコード一覧画面のカスタマイズ"
+    },
+    {
+      "id": "table",
+      "name": "テーブル",
+      "description": "サブテーブルの操作・集計"
+    },
+    {
+      "id": "process",
+      "name": "プロセス管理",
+      "description": "ワークフロー・ステータス管理"
+    },
+    {
+      "id": "date",
+      "name": "日付・時刻",
+      "description": "日付・時刻の計算・表示"
+    }
+  ]
+}

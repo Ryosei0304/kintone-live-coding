@@ -1,0 +1,92 @@
+/**
+ * スタイル: セクション見出し
+ * 説明: フォームのセクション見出しのスタイル定義
+ */
+
+/* セクション見出しコンテナ */
+.kintone-section-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin: 8px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* アイコン */
+.kintone-section-icon {
+  font-size: 20px;
+  margin-right: 10px;
+  line-height: 1;
+}
+
+/* ラベル */
+.kintone-section-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.5px;
+}
+
+/* ダークテーマ対応 */
+@media (prefers-color-scheme: dark) {
+  .kintone-section-header {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* 代替テーマ: シンプル */
+.kintone-section-header--simple {
+  background: #f5f5f5;
+  border-left: 4px solid #3498db;
+  border-radius: 0 4px 4px 0;
+}
+
+.kintone-section-header--simple .kintone-section-label {
+  color: #333333;
+}
+
+/* 代替テーマ: アウトライン */
+.kintone-section-header--outline {
+  background: transparent;
+  border: 2px solid #3498db;
+  border-radius: 8px;
+}
+
+.kintone-section-header--outline .kintone-section-label {
+  color: #3498db;
+}
+
+/* レスポンシブ対応 */
+@media screen and (max-width: 768px) {
+  .kintone-section-header {
+    padding: 10px 12px;
+    margin: 6px 0;
+  }
+
+  .kintone-section-icon {
+    font-size: 18px;
+    margin-right: 8px;
+  }
+
+  .kintone-section-label {
+    font-size: 14px;
+  }
+}
+
+/* 印刷対応 */
+@media print {
+  .kintone-section-header {
+    background: #f0f0f0 !important;
+    box-shadow: none !important;
+    border: 1px solid #cccccc;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .kintone-section-label {
+    color: #333333 !important;
+  }
+}
