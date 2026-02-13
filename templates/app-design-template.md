@@ -1,6 +1,6 @@
 # アプリ設計書テンプレート
 
-このテンプレートはPhase 2で生成するアプリ設計書の構成を定義する。
+このテンプレートはPhase 4で生成するアプリ設計書の構成を定義する。
 出力ファイル: `アプリ設計書_${Project}_${Date}.md`
 
 ---
@@ -9,7 +9,7 @@
 # ${ProjectName} アプリ設計書
 
 作成日: ${Date}
-関連文書: システム概要書_${Project}_${Date}.md, 機能要件書_${Project}_${Date}.md, 業務フロー_${Project}_${Date}.md
+関連文書: コンテキスト整理_${Project}_${Date}.md, 業務フロー設計_${Project}_${Date}.md, アプリアーキテクチャ_${Project}_${Date}.md
 
 ## 1. アプリ一覧
 
