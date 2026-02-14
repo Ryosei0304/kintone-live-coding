@@ -140,7 +140,7 @@ For each customization requirement:
 | No | パターンID | 対象アプリ | トリガー条件 | 対象フィールド | 備考 |
 |----|-----------|-----------|-------------|---------------|------|
 | 1 | field_disable | 商談管理 | ステータス=完了 | 備考 | 完了後は編集不可 |
-| 2 | style_section_header | 顧客マスタ | - | spacer_basic_info | 基本情報セクション |
+| 2 | style_section_header | 顧客マスタ | - | space_basic_info | 基本情報セクション |
 ```
 
 ## Output Documents
