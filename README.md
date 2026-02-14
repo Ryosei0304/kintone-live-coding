@@ -23,6 +23,19 @@ KINTONE_PASSWORD=your-password
 
 **重要**: `.env` は `.gitignore` に追加済みなので、絶対にコミットしないこと。
 
+### MCPサーバー
+
+以下のMCPサーバーが必要です：
+
+| サーバー | 用途 |
+|----------|------|
+| **playwright** | draw.ioのブラウザ操作（ER図表示・差分検出） |
+| **drawio** | Mermaid→draw.io変換（`open_drawio_mermaid`） |
+| **context7** | ライブラリドキュメント参照 |
+| **pencil** | .penファイルのデザイン編集 |
+
+> **Note**: kintone操作はREST API（curl）で直接実行します。kintone MCPツールは使用しません。
+
 ## 概要
 
 業務担当者（非エンジニア）がkintoneアプリを作成・修正する際、対話形式で情報を収集し、コンテキスト整理→業務フロー設計→アプリアーキテクチャ→統合レビュー→デプロイまでを一貫して支援します。
@@ -112,6 +125,24 @@ flowchart LR
 | **Pass U4** | レイアウト最適化 |
 | **Pass U5** | ビュー更新 |
 
+## エージェント↔スキル対応表
+
+エージェントはツール制限と実行環境を定義し、スキルはドメイン知識を提供します。
+
+| Phase | エージェント | スキル |
+|-------|-------------|--------|
+| 1 | `kintone-context-analyst` | `kintone-context-gathering` |
+| 2 | `kintone-flow-analyst` | `kintone-flow-design` |
+| 3 | `kintone-architect` | `kintone-architecture` |
+| 4 | - | `kintone-integration-review`, `kintone-app-design`, `kintone-field-design` |
+| 5 | `kintone-deployer` | `kintone-app-creation` |
+| 5b | `kintone-customizer` | `kintone-customize` |
+| R1 | `kintone-reverse-engineer` | `kintone-reverse-engineering` |
+| R2 | `kintone-change-planner` | `kintone-change-planning` |
+| R3 | `kintone-design-updater` | - |
+| R4 | `kintone-updater` | `kintone-app-update` |
+| Util | `kintone-setup` | `kintone-mcp-setup`, `kintone-error-handbook`, `kintone-relationship-visualizer`, `kintone-testdata` |
+
 ## 利用可能なスキル
 
 ### メインスキル
@@ -123,34 +154,36 @@ flowchart LR
 
 ### フェーズ別スキル（`/start`）
 
-| スキル | コマンド | Phase |
-|--------|----------|-------|
-| kintone-context-gathering | `/kintone-context-gathering` | Phase 1: コンテキスト把握 |
-| kintone-flow-design | `/kintone-flow-design` | Phase 2: 業務フロー設計 |
-| kintone-architecture | `/kintone-architecture` | Phase 3: アプリアーキテクチャ |
-| kintone-integration-review | `/kintone-integration-review` | Phase 4: 統合レビュー |
-| kintone-app-design | `/kintone-app-design` | Phase 4: アプリ設計書生成 |
-| kintone-field-design | `/kintone-field-design` | Phase 4: フィールド設計書生成 |
-| kintone-app-creation | `/kintone-app-creation` | Phase 5: 2-Passデプロイ |
-| kintone-customize | `/kintone-customize` | Phase 5: カスタマイズ適用 |
+| スキル | Phase | 自動実行防止 |
+|--------|-------|:---:|
+| kintone-context-gathering | Phase 1: コンテキスト把握 | - |
+| kintone-flow-design | Phase 2: 業務フロー設計 | - |
+| kintone-architecture | Phase 3: アプリアーキテクチャ | - |
+| kintone-integration-review | Phase 4: 統合レビュー | - |
+| kintone-app-design | Phase 4: アプリ設計書生成 | - |
+| kintone-field-design | Phase 4: フィールド設計書生成 | - |
+| kintone-app-creation | Phase 5: 2-Passデプロイ | yes |
+| kintone-customize | Phase 5: カスタマイズ適用 | yes |
 
 ### フェーズ別スキル（`/restart`）
 
-| スキル | コマンド | Phase |
-|--------|----------|-------|
-| kintone-reverse-engineering | `/kintone-reverse-engineering` | Phase R1: リバースエンジニアリング |
-| kintone-change-planning | `/kintone-change-planning` | Phase R2: 変更計画作成 |
-| kintone-app-update | `/kintone-app-update` | Phase R4: 5-Passアップデートデプロイ |
+| スキル | Phase | 自動実行防止 |
+|--------|-------|:---:|
+| kintone-reverse-engineering | Phase R1: リバースエンジニアリング | - |
+| kintone-change-planning | Phase R2: 変更計画作成 | - |
+| kintone-app-update | Phase R4: 5-Passアップデートデプロイ | yes |
 
 ### ユーティリティスキル
 
-| スキル | コマンド | 説明 |
-|--------|----------|------|
-| kintone-mcp-setup | `/kintone-mcp-setup` | kintone接続のセットアップ支援 |
-| kintone-testdata | `/kintone-testdata` | デプロイ済みアプリにテストデータを自動投入（3件） |
-| kintone-error-handbook | `/kintone-error-handbook` | REST APIエラーコード別対処法ハンドブック |
-| kintone-relationship-visualizer | `/kintone-relationship-visualizer` | アプリ間の関係をMermaid ER図で可視化 |
-| drawio-diff | `/drawio-diff` | draw.io ER図と設計書の差分検出・自動更新 |
+| スキル | 説明 | 自動実行防止 |
+|--------|------|:---:|
+| kintone-mcp-setup | kintone接続のセットアップ支援 | - |
+| kintone-testdata | デプロイ済みアプリにテストデータを自動投入（3件） | yes |
+| kintone-error-handbook | REST APIエラーコード別対処法ハンドブック | - |
+| kintone-relationship-visualizer | アプリ間の関係をMermaid ER図で可視化 | - |
+| drawio-diff | draw.io ER図と設計書の差分検出・自動更新 | - |
+
+> **自動実行防止（`disable-model-invocation: true`）**: kintoneへの書き込みを伴うスキルは、Claudeが自動で実行しないよう制限されています。ワークフロースキルから明示的に呼び出されます。
 
 ### レビュースキル（HITL前自動実行）
 
@@ -158,22 +191,6 @@ flowchart LR
 |--------|------|
 | kintone-design-review | 設計書のkintone制限値・設計パターンを検証 |
 | kintone-creation-review | デプロイ前のAPI制限値・デプロイ順序を検証 |
-
-## 利用可能なサブエージェント
-
-| エージェント | 用途 |
-|--------------|------|
-| kintone-setup | kintone接続のセットアップ確認・支援 |
-| kintone-context-analyst | ペインポイント起点のヒアリング・コンテキスト整理書生成 |
-| kintone-flow-analyst | 業務フロー分析・ビジネスイベント洗い出し |
-| kintone-architect | ビジネスイベントからアプリ境界決定・ER図生成 |
-| kintone-designer | アプリ設計書・フィールド設計書の生成 |
-| kintone-design-updater | 変更計画に基づく設計書の更新 |
-| kintone-deployer | kintoneへの新規デプロイ実行（REST API） |
-| kintone-updater | 既存kintoneアプリへの変更適用（5-Pass） |
-| kintone-customizer | カスタマイズコードの生成・REST APIで適用 |
-| kintone-reverse-engineer | 既存アプリの読み込み・現状分析書生成 |
-| kintone-change-planner | ユーザーの変更要望を構造化された変更計画に変換 |
 
 ## カスタマイズパターン（18パターン / 9カテゴリ）
 
@@ -200,20 +217,19 @@ kintone-live-coding/
 │   │   ├── start.md                    # /start → 新規作成ワークフロー
 │   │   └── restart.md                  # /restart → 既存修正ワークフロー
 │   ├── agents/                          # サブエージェント定義
-│   │   ├── kintone-setup.md            # 接続セットアップ支援
+│   │   ├── kintone-setup.md            # REST API接続セットアップ支援
 │   │   ├── kintone-context-analyst.md  # コンテキスト把握・ヒアリング
 │   │   ├── kintone-flow-analyst.md     # 業務フロー分析
 │   │   ├── kintone-architect.md        # アプリアーキテクチャ設計
-│   │   ├── kintone-designer.md         # アプリ・フィールド設計
 │   │   ├── kintone-design-updater.md   # 設計書更新（/restart用）
 │   │   ├── kintone-deployer.md         # 新規デプロイ実行
 │   │   ├── kintone-updater.md          # 既存アプリ更新（/restart用）
 │   │   ├── kintone-customizer.md       # カスタマイズ生成・適用
 │   │   ├── kintone-reverse-engineer.md # リバースエンジニアリング
 │   │   ├── kintone-change-planner.md   # 変更計画作成
-│   │   └── reference/                  # エージェント参照資料
-│   │       ├── context-interview-flow.md
-│   │       └── flow-analysis-guide.md
+│   │   └── deprecated/                 # 非推奨エージェント
+│   │       ├── kintone-designer.md     # → kintone-architect に統合
+│   │       └── v1/                     # v1レガシー
 │   ├── rules/                           # プロジェクトルール
 │   │   ├── kintone-api.md              # REST API操作・認証ルール
 │   │   ├── priority-deployment.md      # 2-Pass / 5-Passデプロイルール
@@ -221,8 +237,8 @@ kintone-live-coding/
 │   └── skills/                          # スキル定義
 │       ├── kintone-workflow/           # メインワークフロー（/start）
 │       ├── kintone-restart-workflow/   # 既存修正ワークフロー（/restart）
-│       ├── kintone-context-gathering/  # Phase 1: コンテキスト把握
-│       ├── kintone-flow-design/        # Phase 2: 業務フロー設計
+│       ├── kintone-context-gathering/  # Phase 1（+ ヒアリングフロー参照資料）
+│       ├── kintone-flow-design/        # Phase 2（+ フロー分析ガイド参照資料）
 │       ├── kintone-architecture/       # Phase 3: アーキテクチャ
 │       ├── kintone-integration-review/ # Phase 4: 統合レビュー
 │       ├── kintone-app-design/         # Phase 4: アプリ設計書
@@ -239,7 +255,10 @@ kintone-live-coding/
 │       ├── kintone-testdata/           # テストデータ投入
 │       ├── kintone-error-handbook/     # エラー対処法
 │       ├── kintone-relationship-visualizer/ # ER図可視化
-│       └── drawio-diff/               # draw.io差分検出
+│       ├── drawio-diff/               # draw.io差分検出
+│       └── deprecated/                # 非推奨スキル
+│           ├── kintone-proposal/      # → kintone-context-gathering に統合
+│           └── kintone-proposal-review/ # → kintone-design-review に統合
 ├── templates/                           # ドキュメントテンプレート
 │   ├── context-template.md            # コンテキスト整理書
 │   ├── flow-design-template.md        # 業務フロー設計書
@@ -303,7 +322,7 @@ outputs/${ProjectName}/
 
 ## 制約事項
 
-- **REST APIのみ使用**: Bash + curlで直接呼び出し（MCPツールは使用しない）
+- **kintone操作はREST API（curl）で実行**: kintone MCPツールは使用しない
 - **2-Passデプロイ**（新規）: Pass 1で基本フィールド、Pass 2でルックアップ/関連レコード
 - **5-Passアップデートデプロイ**（既存修正）: フィールド→関係→プロセス管理→レイアウト→ビュー
 - **HITL必須**: 各Phase移行前の確認はスキップ不可
