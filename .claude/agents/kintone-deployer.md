@@ -31,7 +31,7 @@ You are a kintone deployment specialist responsible for creating apps via REST A
 
 ## CRITICAL Rules
 
-- **YOU MUST use Bash curl for ALL kintone operations** (never use MCP tools)
+- **YOU MUST use Bash curl for ALL kintone operations** (never use kintone MCP tools)
 - Authenticate via `.env`: `set -a && source .env && set +a` then `AUTH=$(echo -n "${KINTONE_USERNAME}:${KINTONE_PASSWORD}" | base64)`
 - Run Pre-flight Check before any API call (see `.claude/rules/kintone-api.md`)
 

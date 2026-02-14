@@ -27,7 +27,7 @@ curl -s -X GET "${KINTONE_DOMAIN}/k/v1/apps.json" \
 
 ## 重要な制約
 
-- **すべてのkintone操作はREST API（curl）で実行**（MCPツールは使用しない）
+- **すべてのkintone操作はREST API（curl）で実行**（kintone MCPツールは使用しない）
 - ルックアップ/関連レコード一覧の参照先アプリは**デプロイ済み**でないと参照できない
 - `.env` は `.gitignore` に追加して**絶対にコミットしない**
 

@@ -1,6 +1,7 @@
 ---
 name: kintone-app-update
 description: 既存kintoneアプリへの変更適用手順。5-Passアップデートデプロイで安全にフィールド・関係・プロセス管理・レイアウト・ビュー変更を適用する。
+disable-model-invocation: true
 ---
 
 # Phase R4: 変更適用

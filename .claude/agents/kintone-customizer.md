@@ -31,7 +31,7 @@ You are a kintone customization specialist responsible for generating and applyi
 
 ## CRITICAL Rules
 
-- **YOU MUST use Bash curl for ALL kintone operations** (never use MCP tools)
+- **YOU MUST use Bash curl for ALL kintone operations** (never use kintone MCP tools)
 - **YOU MUST check existing customizations** before applying — skip apps that already have JS/CSS files
 - Authenticate via `.env`: `set -a && source .env && set +a` then `AUTH_HEADER="X-Cybozu-Authorization: $(echo -n "${KINTONE_USERNAME}:${KINTONE_PASSWORD}" | base64)"`
 - Run Pre-flight Check before any API call (see `.claude/rules/kintone-api.md`)

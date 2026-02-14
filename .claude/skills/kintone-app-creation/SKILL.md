@@ -1,6 +1,7 @@
 ---
 name: kintone-app-creation
 description: Phase 3: kintoneアプリ作成。アプリ設計書・フィールド設計書からkintoneアプリを自動構築します。優先度順によるアプリ間依存解決、フィールド作成、レイアウト調整を行います。
+disable-model-invocation: true
 ---
 
 # kintoneアプリ作成
@@ -49,7 +50,7 @@ echo "Auth: Set"
 
 ## Pre-flight Check（必須）
 
-**MCPツールと異なり、REST API直接呼び出しではバリデーションがないため、API操作前に必ず実行する。**
+**curlでAPI操作する場合はバリデーションがないため、操作前に必ず実行する。**
 
 ```bash
 # 1. 環境変数の確認
@@ -77,7 +78,7 @@ echo "✅ kintone接続確認完了"
 
 ## バリデーション（Layer 2: インライン関数）
 
-**MCPツールと異なり、REST API直接呼び出しではスキーマ検証がないため、API呼び出し前に必ずバリデーションを実行する。**
+**curlでAPI操作する場合はスキーマ検証がないため、API呼び出し前に必ずバリデーションを実行する。**
 
 ### バリデーション対象
 

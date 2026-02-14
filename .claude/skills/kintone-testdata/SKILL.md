@@ -1,6 +1,7 @@
 ---
 name: kintone-testdata
 description: デプロイ済みkintoneアプリにテストデータを自動投入（3件）。
+disable-model-invocation: true
 ---
 
 # kintone テストデータ投入
@@ -29,7 +30,7 @@ description: デプロイ済みkintoneアプリにテストデータを自動投
 
 ## Pre-flight Check（必須）
 
-**MCPツールと異なり、REST API直接呼び出しではバリデーションがないため、API操作前に必ず実行する。**
+**curlでAPI操作する場合はバリデーションがないため、操作前に必ず実行する。**
 
 ```bash
 # 1. 環境変数の確認
@@ -57,7 +58,7 @@ echo "✅ kintone接続確認完了"
 
 ## バリデーション（Layer 2: インライン関数）
 
-**MCPツールと異なり、REST API直接呼び出しではスキーマ検証がないため、API呼び出し前に必ずバリデーションを実行する。**
+**curlでAPI操作する場合はスキーマ検証がないため、API呼び出し前に必ずバリデーションを実行する。**
 
 ### バリデーション対象
 
