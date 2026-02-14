@@ -1,11 +1,11 @@
 ---
 name: kintone-app-update
-description: 既存kintoneアプリへの変更適用手順。3-Passアップデートデプロイで安全にフィールド・関係・レイアウト変更を適用する。
+description: 既存kintoneアプリへの変更適用手順。5-Passアップデートデプロイで安全にフィールド・関係・プロセス管理・レイアウト・ビュー変更を適用する。
 ---
 
 # Phase R4: 変更適用
 
-設計書に基づき、既存kintoneアプリに変更を適用する3-Passアップデートデプロイ手順書。
+設計書に基づき、既存kintoneアプリに変更を適用する5-Passアップデートデプロイ手順書。
 
 ## 概要
 
@@ -19,7 +19,7 @@ description: 既存kintoneアプリへの変更適用手順。3-Passアップデ
 
 - Pre-flight Check 完了済み
 - 設計書が統合レビュー（Checkpoint R3）を通過済み
-- 変更計画書の3-Pass適用順序が確定済み
+- 変更計画書の5-Pass適用順序が確定済み
 
 ## Pass U1: 基本フィールド変更
 
@@ -113,23 +113,7 @@ POST /k/v1/preview/app/deploy.json
   デプロイ: 完了
 ```
 
-## Pass U3: レイアウト・ビュー・プロセス管理・カスタマイズ
-
-### レイアウト更新
-
-```bash
-PUT /k/v1/preview/app/form/layout.json
-Body: {"app": "${APP_ID}", "layout": [...]}
-```
-
-レイアウトの設計パターンは `kintone-app-creation` スキルの「Phase 3: レイアウト調整」を参照。
-
-### ビュー更新
-
-```bash
-PUT /k/v1/preview/app/views.json
-Body: {"app": "${APP_ID}", "views": {...}}
-```
+## Pass U3: プロセス管理更新
 
 ### プロセス管理更新
 
@@ -138,27 +122,168 @@ PUT /k/v1/preview/app/status.json
 Body: {"app": "${APP_ID}", "enable": true, "states": {...}, "actions": {...}}
 ```
 
-### カスタマイズ更新
+### 完了後
 
-**重要: 既存カスタマイズの保持**
+全対象アプリをデプロイ:
+```bash
+POST /k/v1/preview/app/deploy.json
+```
 
-1. 既存カスタマイズを取得:
-   ```bash
-   GET /k/v1/app/customize.json?app=${APP_ID}
-   ```
+### 進捗表示
 
-2. 変更計画で言及されていないファイルは `fileKey` をそのまま保持
+```
+[Pass U3] プロセス管理更新
+  受注管理: プロセス管理更新 ... OK
+  デプロイ: 完了
+```
 
-3. 新規カスタマイズのみ追加:
-   ```bash
-   # ファイルアップロード
-   POST /k/v1/file.json
-   Body: multipart/form-data (file)
+## Pass U4: レイアウト最適化
 
-   # カスタマイズ更新（既存 + 新規）
-   PUT /k/v1/preview/app/customize.json
-   Body: {"app": "${APP_ID}", "desktop": {"js": [既存fileKeys + 新規fileKey]}}
-   ```
+フィールド設計書のレイアウト設計に基づき、フォームレイアウトを最適化する。
+`/start` の Phase 3（レイアウト調整）と同等の詳細ガイドに従って配置する。
+
+### レイアウト更新API
+
+```bash
+PUT /k/v1/preview/app/form/layout.json
+Body: {"app": "${APP_ID}", "layout": [...]}
+```
+
+### 横並びにすべきフィールドパターン
+
+| パターン | フィールド例 | 1行あたり |
+|----------|-------------|----------|
+| **ペア項目** | 開始日 + 終了日 | 2個 |
+| **名前** | 姓 + 名 | 2個 |
+| **住所** | 都道府県 + 市区町村 + 番地 | 2-3個 |
+| **金額** | 単価 + 数量 + 小計 | 3個 |
+| **連絡先** | 電話 + メール | 2個 |
+| **ルックアップ後** | 自動コピーされるフィールド群 | 2-3個 |
+| **短いフィールド** | ステータス + 優先度 | 2-3個 |
+
+### 横並びにしないフィールド（1行1個）
+
+- 複数行テキスト（MULTI_LINE_TEXT）
+- リッチエディタ（RICH_TEXT）
+- テーブル（SUBTABLE）
+- 関連レコード一覧（REFERENCE_TABLE）
+- 長い選択肢のドロップダウン
+
+### 幅の設定ガイド
+
+| フィールド数/行 | 各フィールド幅目安 |
+|----------------|-------------------|
+| 2フィールド | 各250-350px |
+| 3フィールド | 各150-200px |
+| 4フィールド | 各120-150px |
+
+### スペーサーフィールドの配置
+
+スペーサーはレイアウトAPIで配置し、`style_section_header` カスタマイズで見出しスタイルを適用する。
+
+```json
+{
+  "type": "ROW",
+  "fields": [
+    {
+      "type": "SPACER",
+      "elementId": "space_basic_info",
+      "size": {"width": "700", "height": "30"}
+    }
+  ]
+}
+```
+
+### ラベルフィールドの配置
+
+ラベルはフォームレイアウトAPIで直接配置する（フィールド追加APIは不要）。
+
+```json
+{
+  "type": "ROW",
+  "fields": [
+    {
+      "type": "LABEL",
+      "label": "取得ボタンを押して選択してください",
+      "size": {"width": "300"}
+    }
+  ]
+}
+```
+
+### 完了後
+
+全対象アプリをデプロイ:
+```bash
+POST /k/v1/preview/app/deploy.json
+```
+
+### 進捗表示
+
+```
+[Pass U4] レイアウト最適化
+  顧客マスタ: レイアウト更新 ... OK
+  受注管理: レイアウト更新 ... OK
+  活動履歴: レイアウト設定 ... OK
+  デプロイ: 完了
+```
+
+## Pass U5: ビュー更新
+
+フィールド設計書のビュー設計セクションに基づき、ビューを作成・更新する。
+
+### ビュー作成API
+
+```bash
+PUT /k/v1/preview/app/views.json
+Body: {"app": "${APP_ID}", "views": {...}}
+```
+
+### LIST ビュー
+
+```json
+{
+  "views": {
+    "（すべて）": {
+      "index": "0",
+      "type": "LIST",
+      "name": "（すべて）",
+      "fields": ["customer_name", "status", "updated_datetime"],
+      "sort": "更新日時 desc"
+    },
+    "未対応のみ": {
+      "index": "1",
+      "type": "LIST",
+      "name": "未対応のみ",
+      "fields": ["customer_name", "status", "updated_datetime"],
+      "filterCond": "status in (\"未対応\")",
+      "sort": "更新日時 desc"
+    }
+  }
+}
+```
+
+### CALENDAR ビュー
+
+```json
+{
+  "views": {
+    "スケジュール": {
+      "index": "2",
+      "type": "CALENDAR",
+      "name": "スケジュール",
+      "date": "due_date",
+      "title": "task_name",
+      "sort": "更新日時 desc"
+    }
+  }
+}
+```
+
+### ビュー設計の参照元
+
+- フィールド設計書の「ビュー設計」セクションに定義されたビューを作成する
+- 変更計画で新規追加・変更が指定されたビューのみ適用する
 
 ### 最終デプロイ
 
@@ -170,11 +295,9 @@ POST /k/v1/preview/app/deploy.json
 ### 進捗表示
 
 ```
-[Pass U3] レイアウト・ビュー・プロセス管理・カスタマイズ
-  顧客マスタ: レイアウト更新 ... OK
-  受注管理: レイアウト更新 ... OK
+[Pass U5] ビュー更新
   受注管理: ビュー追加 (進捗ビュー) ... OK
-  活動履歴: レイアウト設定 ... OK
+  活動履歴: ビュー追加 (最新活動) ... OK
   最終デプロイ: 完了
 ```
 
@@ -194,7 +317,9 @@ POST /k/v1/preview/app/deploy.json
       "changes": [
         {"pass": "U1", "type": "ADD_FIELD", "field": "email", "status": "SUCCESS"},
         {"pass": "U1", "type": "DELETE_FIELD", "field": "phone_old", "status": "SUCCESS"},
-        {"pass": "U3", "type": "UPDATE_LAYOUT", "status": "SUCCESS"}
+        {"pass": "U3", "type": "UPDATE_PROCESS", "status": "SUCCESS"},
+        {"pass": "U4", "type": "UPDATE_LAYOUT", "status": "SUCCESS"},
+        {"pass": "U5", "type": "UPDATE_VIEW", "view": "未対応のみ", "status": "SUCCESS"}
       ]
     }
   ],
@@ -233,4 +358,4 @@ POST /k/v1/preview/app/deploy.json
 1. **各Pass完了後に即時記録**: `deployment_result.json` は逐次更新
 2. **デプロイは非同期**: ポーリングで完了を待つ
 3. **ロールバックなし**: kintoneにアトミックトランザクション非対応のため自動ロールバックは行わない
-4. **カスタマイズ保持**: 変更計画外のJS/CSSは絶対に上書きしない
+4. **カスタマイズは別ステップ**: カスタマイズ適用は `kintone-customizer` が担当（R4cで実行）

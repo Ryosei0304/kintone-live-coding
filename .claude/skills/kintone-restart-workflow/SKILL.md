@@ -15,7 +15,9 @@ description: 既存kintoneアプリの読み込み→可視化→変更計画→
 | Phase R1 | リバースエンジニアリング | `kintone-reverse-engineer` | 現状分析書 |
 | Phase R2 | 変更計画作成 | `kintone-change-planner` | 変更計画書 |
 | Phase R3 | 詳細設計更新 | `kintone-design-updater` | アプリ設計書、フィールド設計書 |
-| Phase R4 | 変更適用 | `kintone-updater` / `kintone-customizer` | deployment_result.json |
+| Phase R4a | フィールド・関係・プロセス管理適用 | `kintone-updater` | deployment_result.json |
+| Phase R4b | レイアウト・ビュー適用 | `kintone-updater` | deployment_result.json 更新 |
+| Phase R4c | カスタマイズ変更 | `kintone-customizer` | deployment_result.json 更新 |
 
 各フェーズ前にチェックポイント（HITL）あり。
 
@@ -49,8 +51,9 @@ Phase R3: Task(kintone-design-updater) → 詳細設計更新
 Checkpoint R3: 統合レビュー + 最終確認（HITL）
   ↓
 Phase R4:
-  R4a: Task(kintone-updater) → フィールド・関係・レイアウト・ビュー変更適用
-  R4b: Task(kintone-customizer) → カスタマイズ変更（変更がある場合のみ）
+  R4a: Task(kintone-updater) → フィールド・関係・プロセス管理変更適用（Pass U1-U3）
+  R4b: Task(kintone-updater) → レイアウト最適化 + ビュー更新（Pass U4-U5）
+  R4c: Task(kintone-customizer) → カスタマイズ変更（変更がある場合のみ）
   ↓
 Step 5d: フィードバック収集（R2/R3/R4に戻るルーティング）
 ```
@@ -222,7 +225,7 @@ Task(kintone-change-planner):
     4. ユーザーの変更要望を具体的な変更操作に分解
     5. 必要に応じてAskUserQuestionで詳細を確認
     6. リスク評価
-    7. 3-Pass適用順序を計画
+    7. 5-Pass適用順序を計画
     8. 変更計画書を生成
 
     ## 出力ファイル
@@ -293,7 +296,7 @@ Task(kintone-design-updater):
     4. 現状分析書の全アプリフィールド定義に、変更計画のADD/MODIFY/DELETEを反映
     5. 新規アプリがある場合は完全なフィールド設計を新規作成
     6. アプリ設計書を生成（接続図、デプロイ順序含む）
-    7. フィールド設計書を生成（全アプリの全フィールド、レイアウト、カスタマイズ設計含む）
+    7. フィールド設計書を生成（全アプリの全フィールド、レイアウト、ビュー、カスタマイズ設計含む）
 
     ## 出力ファイル
     - ${OutputDir}アプリ設計書_${Project}_${Date}.md
@@ -323,7 +326,7 @@ Task(kintone-design-updater):
 - [ ] サブテーブル変更が全体再定義で計画されているか
 
 **4. デプロイ計画チェック**:
-- [ ] 3-Passの適用順序が依存関係を満たすか
+- [ ] 5-Passの適用順序が依存関係を満たすか
 - [ ] 新規アプリのデプロイが既存アプリの関係変更より先か
 
 #### 判定
@@ -336,19 +339,19 @@ Task(kintone-design-updater):
 1. 上記チェックリストを実行
 2. `統合レビュー_${Project}_${Date}.md` を生成
 3. CRITICAL = 0 確認
-4. デプロイ計画表示（3-Pass方式）
+4. デプロイ計画表示（5-Pass方式）
 5. AskUserQuestion: 「Phase R4（変更適用）に進んでよろしいですか？」
    - 進む → Phase R4へ
    - 修正する → 修正内容を聞いてPhase R3を再起動
 
 ## Phase R4: 変更適用
 
-### Step R4a: フィールド・関係・レイアウト・ビュー変更
+### Step R4a: フィールド・関係・プロセス管理変更（Pass U1-U3）
 
 ```
 Task(kintone-updater):
   prompt: |
-    以下の手順でkintoneアプリに変更を適用してください。
+    以下の手順でkintoneアプリにフィールド・関係・プロセス管理の変更を適用してください。
 
     ## プロジェクト情報
     - プロジェクト名: ${Project}
@@ -365,17 +368,51 @@ Task(kintone-updater):
     1. 上記のインプットファイルを全て読み込む
     2. `.claude/skills/kintone-app-update/SKILL.md` を読んで更新手順を確認
     3. Pre-flight Check を実行
-    4. 3-Pass アップデートデプロイを実行
+    4. Pass U1-U3 を実行（フィールド・関係・プロセス管理のみ）
        - Pass U1: 基本フィールド変更
        - Pass U2: 新規アプリ + 関係変更
-       - Pass U3: レイアウト・ビュー・プロセス管理
-    5. deployment_result.json を生成（カスタマイズは次ステップ）
+       - Pass U3: プロセス管理更新
+    5. deployment_result.json を生成（レイアウト・ビュー・カスタマイズは次ステップ）
 
     ## 出力ファイル
     - ${OutputDir}deployment_result_${Date}.json
 ```
 
-### Step R4b: カスタマイズ変更（条件付き）
+### Step R4b: レイアウト最適化 + ビュー更新（Pass U4-U5）
+
+```
+Task(kintone-updater):
+  prompt: |
+    以下の手順でkintoneアプリのレイアウトとビューを更新してください。
+
+    ## プロジェクト情報
+    - プロジェクト名: ${Project}
+    - 日付: ${Date}
+    - 出力先: ${OutputDir}
+
+    ## インプット（最初に全て読み込むこと）
+    - ${OutputDir}フィールド設計書_${Project}_${Date}.md（レイアウト設計・ビュー設計セクション）
+    - ${OutputDir}deployment_result_${Date}.json（アプリID参照）
+    - ${OutputDir}変更計画_${Project}_${Date}.md（レイアウト・ビュー変更セクション）
+
+    ## 手順
+    1. 上記のインプットファイルを全て読み込む
+    2. `.claude/skills/kintone-app-update/SKILL.md` を読んで Pass U4-U5 の手順を確認
+    3. Pass U4: レイアウト最適化
+       - フィールド設計書のレイアウト設計に基づきフォームレイアウトを更新
+       - 横並びパターン、スペーサー、ラベルの最適配置
+       - デプロイ
+    4. Pass U5: ビュー更新
+       - フィールド設計書のビュー設計に基づきビューを作成・更新
+       - LIST / CALENDAR ビュー対応
+       - 最終デプロイ
+    5. deployment_result.json のレイアウト・ビュー操作を記録
+
+    ## 出力
+    - deployment_result_${Date}.json の changes 配列を更新（U4/U5 操作を追記）
+```
+
+### Step R4c: カスタマイズ変更（条件付き）
 
 #### 実行判定（メインエージェント直接実行）
 
@@ -440,7 +477,8 @@ Task(kintone-customizer):
 |-----------------|--------|
 | フィールド追加・変更・アプリ追加・関係変更 | Phase R2（変更計画再作成） |
 | 設計書の記載ミス・フィールド定義の微修正 | Phase R3（設計書更新） |
-| デプロイ設定・カスタマイズ修正のみ | Phase R4（該当パスのみ再実行） |
+| レイアウト修正・ビュー修正 | Phase R4b（レイアウト・ビューのみ再実行） |
+| デプロイ設定・カスタマイズ修正のみ | Phase R4c（カスタマイズのみ再実行） |
 
 **重要**: `/start` への誘導はしない。全て `/restart` フロー内で完結する。
 
